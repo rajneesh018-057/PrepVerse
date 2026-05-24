@@ -3,6 +3,7 @@ import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import { askAi } from "../services/openRouter.service.js";
 import User from "../models/user.model.js";
 import Interview from "../models/interview.model.js";
+import redis from "../config/redis.js";
 
 export const analyzeResume = async (req, res) => {
   try {
