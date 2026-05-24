@@ -1,195 +1,142 @@
-﻿# InterviewIQ 🚀
+🚀 InterviewIQ
 
-AI-powered mock interview platform built with MERN stack, Redis caching, and Google Authentication.
+AI-powered mock interview platform built with MERN stack, Redis caching, Docker, and Google Authentication.
 
----
-
-## Features ✨
-
-- 🔐 Google Authentication
-- 🤖 AI Interview Question Generation
-- ⚡ Redis Caching for Faster Responses
-- 💳 Razorpay Payment Integration
-- 👤 User Authentication & Authorization
-- 📄 Resume-based Interview Generation
-- 🧠 AI-powered Interview Experience
-- 📦 Docker Redis Setup
-- 🎯 Optimized Backend Performance
-
----
-
-## Tech Stack 🛠️
-
-### Frontend
-- React.js
-- Tailwind CSS
-- Axios
-- React Router DOM
-
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-
-### Authentication
-- JWT
-- Google Auth
-
-### Caching & Performance
-- Redis
-- Docker
-
-### Payments
-- Razorpay
-
----
-
-# Folder Structure 📂
-
-```bash
+✨ Features
+🔐 Google Authentication
+🤖 AI-powered Interview Question Generation
+📄 Resume-based Interview Analysis
+⚡ Redis Caching for Fast Responses
+💳 Razorpay Payment Integration
+👤 JWT Authentication & Authorization
+🧠 AI-based Interview Evaluation
+🐳 Fully Dockerized System (Client + Server + DB + Cache)
+📦 Optimized Backend Performance
+🛠️ Tech Stack
+Frontend
+React.js
+Tailwind CSS
+Axios
+React Router DOM
+Backend
+Node.js
+Express.js
+MongoDB
+Mongoose
+Authentication
+JWT
+Google OAuth
+Caching & Performance
+Redis
+Docker
+Payments
+Razorpay
+📂 Folder Structure
 InterviewIQ/
 │
-├── client/
+├── client/        # Frontend (React)
 │
-├── server/
+├── server/        # Backend (Node + Express)
 │   ├── controllers/
 │   ├── routes/
 │   ├── middlewares/
 │   ├── models/
 │   ├── config/
 │
+├── docker-compose.yml
 └── README.md
-```
-
----
-
-# Environment Variables 🔑
-
-## Server `.env`
-
-```env
-PORT=5000
+🔑 Environment Variables
+Server .env
+PORT=8000
 
 MONGO_URI=your_mongodb_uri
 
-JWT_SECRET=your_secret_key
+JWT_SECRET=your_jwt_secret
 
-REDIS_URL=redis://localhost:6379
+REDIS_HOST=redis
+REDIS_PORT=6379
 
 RAZORPAY_KEY_ID=your_key
 RAZORPAY_SECRET=your_secret
-```
-
----
-
-# Installation ⚙️
-
-## Clone Repository
-
-```bash
+⚙️ Installation (Manual Setup)
+Clone Repository
 git clone https://github.com/rajneesh018-057/Interview.ai.git
-```
-
----
-
-## Install Frontend Dependencies
-
-```bash
-cd client
-npm install
-```
-
----
-
-## Install Backend Dependencies
-
-```bash
+cd Interview.ai
+Install Dependencies
+Backend
 cd server
 npm install
-```
-
----
-
-# Redis Setup Using Docker 🐳
-
-## Pull Redis Image
-
-```bash
-docker pull redis
-```
-
----
-
-## Run Redis Container
-
-```bash
-docker run --name redis-server -p 6379:6379 -d redis
-```
-
----
-
-# Run Project ▶️
-
-## Start Backend
-
-```bash
-cd server
-npm run dev
-```
-
----
-
-## Start Frontend
-
-```bash
-cd client
-npm run dev
-```
-
----
-
-# Redis Caching ⚡
-
-This project uses Redis for:
-
-- User data caching
-- AI response caching
-- Faster API responses
-- Reduced database load
-
-Example cache flow:
-
-```txt
 Frontend
-   ↓
-Express Backend
-   ↓
-Redis Cache
-   ↓
-MongoDB
-```
+cd client
+npm install
+🐳 Docker Setup (Recommended)
 
----
+This project is fully dockerized and includes:
 
+React frontend
+Node.js backend
+MongoDB database
+Redis cache
+🚀 Run Entire Project with Docker
 
+From project root:
 
-# Future Improvements 🚀
+docker-compose up --build
+🌐 Access Application
+Service	URL
+Frontend	http://localhost:3000
+Backend API	http://localhost:8000
+MongoDB	mongodb://localhost:27017
+Redis	localhost:6379
+🛑 Stop Containers
+docker-compose down
+🐳 Docker Architecture
+Client (React)
+     ↓
+Backend (Node.js + Express)
+     ↓
+Redis (Cache Layer)
+     ↓
+MongoDB (Database)
+⚡ Redis Caching
 
-- AI Response Caching
-- Redis Rate Limiting
-- Admin Dashboard
-- Interview Analytics
-- Voice AI Interviews
-- WebSocket Real-time Interviews
+Redis is used for:
 
----
+AI-generated interview questions caching
+Faster API response time
+Reduced database load
+Improved performance
 
-# Author 👨‍💻
+Example flow:
+
+Request → Backend → Redis Check → MongoDB / AI → Response → Cache Store
+📦 Redis Setup (Docker Service)
+redis:
+  image: redis:7
+  container_name: redis
+  ports:
+    - "6379:6379"
+
+Backend connects via:
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+🚀 Run Without Docker (Optional)
+Start Backend
+cd server
+npm run dev
+Start Frontend
+cd client
+npm run dev
+🔮 Future Improvements
+Voice-based AI Interviews 🎤
+WebSocket real-time interviews ⚡
+Advanced analytics dashboard 📊
+AI scoring improvements 🧠
+Admin panel 👨‍💻
+👨‍💻 Author
 
 Rajneesh Kumar
 
 GitHub:
 https://github.com/rajneesh018-057
-
----
