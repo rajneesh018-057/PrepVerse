@@ -60,7 +60,7 @@ RAZORPAY_KEY_ID=your_key
 RAZORPAY_SECRET=your_secret
 ⚙️ Installation (Manual Setup)
 Clone Repository
-git clone https://github.com/rajneesh018-057/Interview.ai.git
+git clone httpsz//github.com/rajneesh018-057/Interview.ai.git
 cd Interview.ai
 Install Dependencies
 Backend
