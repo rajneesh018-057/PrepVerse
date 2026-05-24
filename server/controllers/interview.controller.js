@@ -84,17 +84,19 @@ Return strictly JSON:
 
 export const generateQuestion = async (req, res) => {
   try {
-    let { role, experience, mode, resumeText, projects, skills } = req.body
+    let { role, experience, mode, resumeText, projects, skills } = req.body;
 
     role = role?.trim();
     experience = experience?.trim();
     mode = mode?.trim();
 
     if (!role || !experience || !mode) {
-      return res.status(400).json({ message: "Role, Experience and Mode are required." })
+      return res.status(400).json({
+        message: "Role, Experience and Mode are required."
+      });
     }
 
-    const user = await User.findById(req.userId)
+    const user = await User.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({
@@ -118,14 +120,47 @@ export const generateQuestion = async (req, res) => {
 
     const safeResume = resumeText?.trim() || "None";
 
+    /* =========================
+       REDIS CACHE KEY
+    ========================= */
+
+    const cacheKey = `
+interview:
+${role}:
+${experience}:
+${mode}:
+${projectText}:
+${skillsText}
+`.trim();
+
+    /* =========================
+       CHECK CACHE
+    ========================= */
+
+    const cachedQuestions = await redis.get(cacheKey);
+
+    if (cachedQuestions) {
+      console.log("Redis Cache Hit ✅");
+
+      const parsedQuestions = JSON.parse(cachedQuestions);
+
+      return res.status(200).json({
+        success: true,
+        source: "redis-cache",
+        questions: parsedQuestions
+      });
+    }
+
+    console.log("AI API Called 🚀");
+
     const userPrompt = `
-    Role:${role}
-    Experience:${experience}
-    InterviewMode:${mode}
-    Projects:${projectText}
-    Skills:${skillsText},
-    Resume:${safeResume}
-    `;
+Role:${role}
+Experience:${experience}
+InterviewMode:${mode}
+Projects:${projectText}
+Skills:${skillsText}
+Resume:${safeResume}
+`;
 
     if (!userPrompt.trim()) {
       return res.status(400).json({
@@ -134,52 +169,48 @@ export const generateQuestion = async (req, res) => {
     }
 
     const messages = [
-
       {
         role: "system",
         content: `
 You are a real human interviewer conducting a professional interview.
 
-Speak in simple, natural English as if you are directly talking to the candidate.
+Speak in simple, natural English.
 
 Generate exactly 5 interview questions.
 
-Strict Rules:
-- Each question must contain between 15 and 25 words.
-- Each question must be a single complete sentence.
-- Do NOT number them.
-- Do NOT add explanations.
-- Do NOT add extra text before or after.
-- One question per line only.
-- Keep language simple and conversational.
-- Questions must feel practical and realistic.
+Rules:
+- 15–25 words each
+- single sentence only
+- no numbering
+- no extra text
+- one per line
 
-Difficulty progression:
-Question 1 → easy  
-Question 2 → easy  
-Question 3 → medium  
-Question 4 → medium  
-Question 5 → hard  
+Difficulty:
+Q1 easy
+Q2 easy
+Q3 medium
+Q4 medium
+Q5 hard
 
-Make questions based on the candidate’s role, experience,interviewMode, projects, skills, and resume details.
+Base questions on role, experience, mode, projects, skills, resume.
 `
-      }
-      ,
+      },
       {
         role: "user",
         content: userPrompt
       }
     ];
 
+    /* =========================
+       AI CALL
+    ========================= */
 
-    const aiResponse = await askAi(messages)
+    const aiResponse = await askAi(messages);
 
     if (!aiResponse || !aiResponse.trim()) {
-           
       return res.status(500).json({
         message: "AI returned empty response."
       });
-
     }
 
     const questionsArray = aiResponse
@@ -189,14 +220,34 @@ Make questions based on the candidate’s role, experience,interviewMode, projec
       .slice(0, 5);
 
     if (questionsArray.length === 0) {
-      
       return res.status(500).json({
         message: "AI failed to generate questions."
       });
     }
 
+    /* =========================
+       STORE IN REDIS
+    ========================= */
+
+    await redis.set(
+      cacheKey,
+      JSON.stringify(questionsArray),
+      "EX",
+      86400 // 24 hours
+    );
+
+    console.log("Cached in Redis ✅");
+
+    /* =========================
+       DEDUCT CREDITS
+    ========================= */
+
     user.credits -= 50;
     await user.save();
+
+    /* =========================
+       SAVE INTERVIEW
+    ========================= */
 
     const interview = await Interview.create({
       userId: user._id,
@@ -209,18 +260,27 @@ Make questions based on the candidate’s role, experience,interviewMode, projec
         difficulty: ["easy", "easy", "medium", "medium", "hard"][index],
         timeLimit: [60, 60, 90, 90, 120][index],
       }))
-    })
+    });
 
-    res.json({
+    /* =========================
+       RESPONSE
+    ========================= */
+
+    return res.status(200).json({
+      success: true,
+      source: "ai-api",
       interviewId: interview._id,
       creditsLeft: user.credits,
       userName: user.name,
       questions: interview.questions
     });
+
   } catch (error) {
-    return res.status(500).json({message:`failed to create interview ${error}`})
+    return res.status(500).json({
+      message: `failed to create interview ${error}`
+    });
   }
-}
+};
 
 
 export const submitAnswer = async (req, res) => {
