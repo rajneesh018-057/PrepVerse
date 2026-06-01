@@ -1,4 +1,4 @@
-﻿🚀 InterviewIQ
+﻿🚀PrepVerse
 
 AI-powered mock interview platform built with MERN stack, Redis caching, Docker, and Google Authentication.
 
