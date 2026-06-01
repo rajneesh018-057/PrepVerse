@@ -60,7 +60,7 @@ function Navbar() {
                     </div>
 
                     <h1 className='font-semibold hidden md:block text-lg'>
-                        InterviewIQ.AI
+                       PrepVerse
                     </h1>
 
                 </div>
